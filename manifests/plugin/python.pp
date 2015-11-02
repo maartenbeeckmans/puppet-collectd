@@ -1,7 +1,9 @@
 class collectd::plugin::python {
 
-  package {'collectd-python':
-    ensure => 'present',
+  if $::operatingsystemmajrelease != 7 {
+    package {'collectd-python':
+      ensure => 'present',
+    }
   }
 
   file { '/etc/collectd.d/00python.conf':
