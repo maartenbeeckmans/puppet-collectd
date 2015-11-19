@@ -1,6 +1,9 @@
+# class collectd::plugin::mongodb
 class collectd::plugin::mongodb(
   $mongod_bind_ip = '127.0.0.1',
 ){
+
+  include ::collectd::plugin::python
 
   if !defined(Package['python-pip']) {
     package { 'python-pip':
