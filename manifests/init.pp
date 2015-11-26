@@ -13,6 +13,7 @@
 # [Remember: No empty lines between comments and class definition]
 class collectd (
   $pkgname              = $::collectd::params::pkgname,
+  $pkgversion           = 'latest',
   $config_file          = $::collectd::params::config_file,
   $config_template_name = $::collectd::params::config_template_name,
   $config_dir           = $::collectd::params::config_dir,
@@ -23,7 +24,7 @@ class collectd (
 ) inherits ::collectd::params {
 
   package{$pkgname:
-    ensure => 'present',
+    ensure => $pkgversion,
     alias  => 'collectd',
   }
 
