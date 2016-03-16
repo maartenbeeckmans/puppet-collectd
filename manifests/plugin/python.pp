@@ -1,6 +1,6 @@
 class collectd::plugin::python {
 
-  if $::operatingsystemmajrelease != 7 {
+  if $::operatingsystemmajrelease != '7' {
     package {'collectd-python':
       ensure => 'present',
     }
