@@ -41,7 +41,7 @@ class collectd::plugin::mongodb(
     owner   => '0',
     content => template('collectd/mongodb.conf.erb'),
     require => [
-      Package['pymongo'],
+      Package['python-pymongo'],
       File['/usr/local/collectd-plugins/mongodb.py'],
       File_line['mongoline']
     ],
