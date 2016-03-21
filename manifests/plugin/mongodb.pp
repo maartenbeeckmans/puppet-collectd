@@ -5,17 +5,9 @@ class collectd::plugin::mongodb(
 
   include ::collectd::plugin::python
 
-  if !defined(Package['python-pip']) {
-    package { 'python-pip':
-      ensure => present,
-    }
-  }
-
-  if !defined(Package['pymongo']) {
-    package { 'pymongo':
-      ensure   => 'present',
-      provider => 'pip',
-      require  => Package['python-pip'],
+  if !defined(Package['python-pymongo']) {
+    package { 'python-pymongo':
+      ensure   => present,
     }
   }
 
