@@ -13,9 +13,25 @@
 #   - kayn (Pavel Pulec): collecting stats about replication lag etc..
 
 import collectd
+import socket
 from pymongo import MongoClient
 from pymongo.read_preferences import ReadPreference
 from distutils.version import StrictVersion as V
+
+def replication_get_time_diff(con):
+    col = 'oplog.rs'
+    local = con.local
+    ol = local.system.namespaces.find_one({"name": "local.oplog.$main"})
+    if ol:
+        col = 'oplog.$main'
+    firstc = local[col].find().sort("$natural", 1).limit(1)
+    lastc = local[col].find().sort("$natural", -1).limit(1)
+    first = firstc.next()
+    last = lastc.next()
+    tfirst = first["ts"]
+    tlast = last["ts"]
+    delta = tlast.time - tfirst.time
+    return delta
 
 
 class MongoDB(object):
@@ -134,93 +150,57 @@ class MongoDB(object):
 
         rs_status = {}
         slaveDelays = {}
+        # Get replica set status
         try:
-            # Get replica set status
-            try:
-                rs_status = con.admin.command("replSetGetStatus")
-            except pymongo.errors.OperationFailure, e:
-                if e.code == None and str(e).find('failed: not running with --replSet"'):
-                    print "OK - Not running with replSet"
-                    con.disconnect()
-                    return 0
-
-            rs_conf = con.local.system.replset.find_one()
-            for member in rs_conf['members']:
-                if member.get('slaveDelay') is not None:
-                    slaveDelays[member['host']] = member.get('slaveDelay')
-                else:
-                    slaveDelays[member['host']] = 0
-
-            # Find the primary and/or the current node
-            primary_node = None
-            host_node = None
-
-            for member in rs_status["members"]:
-                if member["stateStr"] == "PRIMARY":
-                    primary_node = member
-                if member["name"].split(':')[0] == host and int(member["name"].split(':')[1]) == port:
-                    host_node = member
-
-            # Check if we're in the middle of an election and don't have a primary
-            if primary_node is None:
-                print "WARNING - No primary defined. In an election?"
-                con.disconnect()
-                return 1
-
-            # Check if we failed to find the current host
-            # below should never happen
-            if host_node is None:
-                print "CRITICAL - Unable to find host '" + host + "' in replica set."
-                con.disconnect()
-                return 2
-            # Is the specified host the primary?
-            if host_node["stateStr"] == "PRIMARY":
-                if max_lag == False:
-                    print "OK - This is the primary."
-                    con.disconnect()
-                    return 0
-                else:
-                    #get the maximal replication lag
-                    data = ""
-                    maximal_lag = 0
-                    for member in rs_status['members']:
-                        if not member['stateStr'] == "ARBITER":
-                            lastSlaveOpTime = member['optimeDate']
-                            replicationLag = abs(primary_node["optimeDate"] - lastSlaveOpTime).seconds - slaveDelays[member['name']]
-                            data = data + member['name'] + " lag=%d;" % replicationLag
-                            maximal_lag = max(maximal_lag, replicationLag)
-
-                    # send message with maximal lag
-                    message = "Maximal lag is " + str(maximal_lag) + " seconds"
-                    print message
-                    self.submit('replication', 'maximal-lag-seconds', str(maximal_lag))
-
-                    # send message with maximal lag in percentage
-                    err, con = mongo_connect(primary_node['name'].split(':')[0], int(primary_node['name'].split(':')[1]), False, user, passwd)
-                    if err != 0:
-                        con.disconnect()
-                        return err
-                    primary_timediff = replication_get_time_diff(con)
-                    maximal_lag = int(float(maximal_lag) / float(primary_timediff) * 100)
-                    message = "Maximal lag is " + str(maximal_lag) + " percents"
-                    print message
-                    self.submit('replication', 'maximal-lag-percentage', str(maximal_lag))
-                    con.disconnect()
-                    return str(maximal_lag)
-            elif host_node["stateStr"] == "ARBITER":
-                print "OK - This is an arbiter"
+            rs_status = con.admin.command("replSetGetStatus")
+        except pymongo.errors.OperationFailure, e:
+            if e.code == None and str(e).find('failed: not running with --replSet"'):
+                print "OK - Not running with replSet"
                 con.disconnect()
                 return 0
 
-            # Find the difference in optime between current node and PRIMARY
-
-            optime_lag = abs(primary_node["optimeDate"] - host_node["optimeDate"])
-            if host_node['name'] in slaveDelays:
-                slave_delay = slaveDelays[host_node['name']]
-            elif host_node['name'].endswith(':27017') and host_node['name'][:-len(":27017")] in slaveDelays:
-                slave_delay = slaveDelays[host_node['name'][:-len(":27017")]]
+        rs_conf = con.local.system.replset.find_one()
+        for member in rs_conf['members']:
+            if member.get('slaveDelay') is not None:
+                slaveDelays[member['host']] = member.get('slaveDelay')
             else:
-                raise Exception("Unable to determine slave delay for {0}".format(host_node['name']))
+                slaveDelays[member['host']] = 0
+
+        # Find the primary and/or the current node
+        primary_node = None
+        host_node = None
+
+        for member in rs_status["members"]:
+            if member["stateStr"] == "PRIMARY":
+                primary_node = member
+            potential_hosts = [ socket.gethostname().split('.')[0], socket.gethostname(), self.mongo_host, socket.gethostbyname(socket.gethostname()) ]
+            if member["name"].split(':')[0] in potential_hosts and int(member["name"].split(':')[1]) == self.mongo_port:
+                host_node = member
+
+        # Check if we're in the middle of an election and don't have a primary
+        if primary_node is None:
+            print "WARNING - No primary defined. In an election?"
+            con.disconnect()
+            return 1
+
+        # Check if we failed to find the current host
+        # below should never happen
+        if host_node is None:
+            print "CRITICAL - Unable to find host '" + self.mongo_host + "' in replica set."
+            con.disconnect()
+            return 2
+        # Is the specified host the primary?
+        if host_node["stateStr"] == "PRIMARY":
+            print "OK - This is the primary."
+            con.disconnect()
+            return 0
+        elif host_node["stateStr"] == "ARBITER":
+            print "OK - This is an arbiter"
+            con.disconnect()
+            return 0
+        else:
+            # Find the difference in optime between current node and PRIMARY
+            optime_lag = abs(primary_node["optimeDate"] - host_node["optimeDate"])
 
             try:  # work starting from python2.7
                 lag = optime_lag.total_seconds()
@@ -233,11 +213,13 @@ class MongoDB(object):
             self.submit('replication', 'lag-seconds', str(lag))
 
             # send message with lag in percentage
-            err, con = mongo_connect(primary_node['name'].split(':')[0], int(primary_node['name'].split(':')[1]), False, user, passwd)
-            if err != 0:
-                con.disconnect()
-                return err
-            primary_timediff = replication_get_time_diff(con)
+            try:
+                con_primary = MongoClient(host=primary_node['name'].split(':')[0], port=int(primary_node['name'].split(':')[1]), read_preference=ReadPreference.SECONDARY)
+            except:
+                print "CRITICAL - Unable to connect to primary node" + primary_node['name'].split(':')[0]
+                return 3
+
+            primary_timediff = replication_get_time_diff(con_primary)
             if primary_timediff != 0:
                 lag = int(float(lag) / float(primary_timediff) * 100)
             else:
@@ -245,13 +227,9 @@ class MongoDB(object):
             message = "Lag is " + str(lag) + " percents"
             print message
             self.submit('replication', 'lag-percentage', str(lag))
+            con_primary.disconnect()
             con.disconnect()
-            return str(lag) 
-            #return check_levels(lag, warning + slaveDelays[host_node['name']], critical + slaveDelays[host_node['name']], message)
-
-        except Exception, e:
-            con.disconnect()
-            return e
+            return 0
 
 
     def config(self, obj):
@@ -273,3 +251,6 @@ mongodb = MongoDB()
 collectd.register_read(mongodb.do_server_status)
 collectd.register_config(mongodb.config)
 
+# comment out the import of collectd, self.submit and collectd.xxx above and run
+# this command below for testing purspose
+# mongodb.do_server_status()
