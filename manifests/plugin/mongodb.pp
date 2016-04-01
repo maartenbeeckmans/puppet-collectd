@@ -24,6 +24,7 @@ class collectd::plugin::mongodb(
     mode   => '0644',
     owner  => 'root',
     source => 'puppet:///modules/collectd/plugin/mongodb.py',
+    notify => Service['collectd'],
   }
 
   file_line { 'mongoline':
@@ -31,6 +32,7 @@ class collectd::plugin::mongodb(
     line   => 'replication             value:GAUGE:U:U',
     match  => '^replication\s+',
     path   => '/usr/share/collectd/types.db',
+    notify => Service['collectd'],
   }
 
 
