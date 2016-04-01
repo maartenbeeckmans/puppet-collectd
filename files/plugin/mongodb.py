@@ -1,60 +1,21 @@
 #!/usr/bin/env python
 #
+################################
+### File managed with puppet ###
+################################
+#
 # Plugin to collectd statistics from MongoDB
 #
-### File managed with puppet ###
+# src: https://github.com/sebest/collectd-mongodb
+#
+# manually changes:
+#   - deu (Zdenek Janda): automatic database discovery
+#   - kayn (Pavel Pulec): collecting stats about replication lag etc..
 
 import collectd
-import pymongo
-from pymongo import Connection
+from pymongo import MongoClient
+from pymongo.read_preferences import ReadPreference
 from distutils.version import StrictVersion as V
-
-def set_read_preference(db):
-    if pymongo.version >= "2.1":
-        db.read_preference = pymongo.ReadPreference.SECONDARY
-
-def mongo_connect(host=None, port=None, ssl=False, user=None, passwd=None, replica=None):
-    try:
-        # ssl connection for pymongo > 2.3
-        if pymongo.version >= "2.3":
-            if replica is None:
-                con = pymongo.MongoClient(host, port)
-            else:
-                con = pymongo.Connection(host, port, read_preference=pymongo.ReadPreference.SECONDARY, ssl=ssl, replicaSet=replica, network_timeout=10)
-        else:
-            if replica is None:
-                con = pymongo.Connection(host, port, slave_okay=True, network_timeout=10)
-            else:
-                con = pymongo.Connection(host, port, slave_okay=True, network_timeout=10)
-                #con = pymongo.Connection(host, port, slave_okay=True, replicaSet=replica, network_timeout=10)
-
-        if user and passwd:
-            db = con["admin"]
-            if not db.authenticate(user, passwd):
-                sys.exit("Username/Password incorrect")
-    except Exception, e:
-        if isinstance(e, pymongo.errors.AutoReconnect) and str(e).find(" is an arbiter") != -1:
-            # We got a pymongo AutoReconnect exception that tells us we connected to an Arbiter Server
-            # This means: Arbiter is reachable and can answer requests/votes - this is all we need to know from an arbiter
-            print "OK - State: 7 (Arbiter)"
-            sys.exit(0)
-        return exit_with_general_critical(e), None
-    return 0, con
-
-def replication_get_time_diff(con):
-    col = 'oplog.rs'
-    local = con.local
-    ol = local.system.namespaces.find_one({"name": "local.oplog.$main"})
-    if ol:
-        col = 'oplog.$main'
-    firstc = local[col].find().sort("$natural", 1).limit(1)
-    lastc = local[col].find().sort("$natural", -1).limit(1)
-    first = firstc.next()
-    last = lastc.next()
-    tfirst = first["ts"]
-    tlast = last["ts"]
-    delta = tlast.time - tfirst.time
-    return delta
 
 
 class MongoDB(object):
@@ -85,17 +46,14 @@ class MongoDB(object):
         v.values = [value, ]
         v.dispatch()
 
-
     def do_server_status(self):
-        host = self.mongo_host
-        port = self.mongo_port
-        user = self.mongo_user
-        passwd = self.mongo_password
-        perf_data = False
-        con = Connection(host=self.mongo_host, port=self.mongo_port, slave_okay=True)
+        con = MongoClient(host=self.mongo_host, port=self.mongo_port, read_preference=ReadPreference.SECONDARY)
+
+        # get list of databases from running mongo
         if not self.mongo_db:
             self.mongo_db = con.database_names()
         db = con[self.mongo_db[0]]
+
         if self.mongo_user and self.mongo_password:
             db.authenticate(self.mongo_user, self.mongo_password)
         server_status = db.command('serverStatus')
@@ -112,42 +70,53 @@ class MongoDB(object):
             self.submit('memory', t, server_status['mem'][t])
 
         # connections
-        self.submit('connections', 'connections', server_status['connections']['current'])
+        self.submit('connections', 'current', server_status['connections']['current'])
+        if 'available' in server_status['connections']:
+            self.submit('connections', 'available', server_status['connections']['available'])
+        if 'totalCreated' in server_status['connections']:
+            self.submit('connections', 'totalCreated', server_status['connections']['totalCreated'])
+
+        # network
+        if 'network' in server_status:
+            for t in ['bytesIn', 'bytesOut', 'numRequests']:
+                self.submit('bytes', t, server_status['network'][t])
 
         # locks
-        if self.lockTotalTime is not None and self.lockTime is not None:
-            if self.lockTime == server_status['globalLock']['lockTime']:
-                value = 0.0
-            else:
-                value = float(server_status['globalLock']['lockTime'] - self.lockTime) * 100.0 / float(server_status['globalLock']['totalTime'] - self.lockTotalTime)
-            self.submit('percent', 'lock_ratio', value)
+        if 'lockTime' in server_status['globalLock']:
+            if self.lockTotalTime is not None and self.lockTime is not None:
+                if self.lockTime == server_status['globalLock']['lockTime']:
+                    value = 0.0
+                else:
+                    value = float(server_status['globalLock']['lockTime'] - self.lockTime) * 100.0 / float(server_status['globalLock']['totalTime'] - self.lockTotalTime)
+                self.submit('percent', 'lock_ratio', value)
 
+            self.lockTime = server_status['globalLock']['lockTime']
         self.lockTotalTime = server_status['globalLock']['totalTime']
-        self.lockTime = server_status['globalLock']['lockTime']
 
         # indexes
-        accesses = None
-        misses = None
-        index_counters = server_status['indexCounters'] if at_least_2_4 else server_status['indexCounters']['btree']
-
-        if self.accesses is not None:
-            accesses = index_counters['accesses'] - self.accesses
-            if accesses < 0:
-                accesses = None
-        misses = (index_counters['misses'] or 0) - (self.misses or 0)
-        if misses < 0:
+        if 'indexCounters' in server_status:
+            accesses = None
             misses = None
-        if accesses and misses is not None:
-            self.submit('cache_ratio', 'cache_misses', int(misses * 100 / float(accesses)))
-        else:
-            self.submit('cache_ratio', 'cache_misses', 0)
-        self.accesses = index_counters['accesses']
-        self.misses = index_counters['misses']
+            index_counters = server_status['indexCounters'] if at_least_2_4 else server_status['indexCounters']['btree']
+
+            if self.accesses is not None:
+                accesses = index_counters['accesses'] - self.accesses
+                if accesses < 0:
+                    accesses = None
+            misses = (index_counters['misses'] or 0) - (self.misses or 0)
+            if misses < 0:
+                misses = None
+            if accesses and misses is not None:
+                self.submit('cache_ratio', 'cache_misses', int(misses * 100 / float(accesses)))
+            else:
+                self.submit('cache_ratio', 'cache_misses', 0)
+            self.accesses = index_counters['accesses']
+            self.misses = index_counters['misses']
 
         for mongo_db in self.mongo_db:
             db = con[mongo_db]
             if self.mongo_user and self.mongo_password:
-                db.authenticate(self.mongo_user, self.mongo_password)
+                con[self.mongo_db[0]].authenticate(self.mongo_user, self.mongo_password)
             db_stats = db.command('dbstats')
 
             # stats counts
@@ -301,5 +270,6 @@ class MongoDB(object):
                 collectd.warning("mongodb plugin: Unkown configuration key %s" % node.key)
 
 mongodb = MongoDB()
-collectd.register_config(mongodb.config)
 collectd.register_read(mongodb.do_server_status)
+collectd.register_config(mongodb.config)
+
