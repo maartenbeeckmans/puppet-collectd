@@ -1,5 +1,5 @@
 class collectd::plugin::apache(
-  $statusurl = 'http://localhost:8008/mod_status?auto',
+  $statusurl = 'http://localhost/server-status?auto',
   $managelocalvhost = false,
 )
 {
