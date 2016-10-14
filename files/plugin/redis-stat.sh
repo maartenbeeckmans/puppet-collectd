@@ -20,7 +20,7 @@ do
   connected_slaves=$(echo "$info"|awk -F : '$1 == "connected_slaves" {print $2}')
   uptime=$(echo "$info"|awk -F : '$1 == "uptime_in_seconds" {print $2}')
   used_memory=$(echo "$info"|awk -F ":" '$1 == "used_memory" {print $2}'|sed -e 's/\r//')
-  changes_since_last_save=$(echo "$info"|awk -F : '$1 == "changes_since_last_save" {print $2}')
+  changes_since_last_save=$(echo "$info"|awk -F : '$1 ~ "(rdb_)?changes_since_last_save" {print $2}')
   total_commands_processed=$(echo "$info"|awk -F : '$1 == "total_commands_processed" {print $2}')
   keys=$(echo "$info"|egrep -e "^db0"|sed -e 's/^.\+:keys=//'|sed -e 's/,.\+//')
   keyspace_misses=$(echo "$info"|awk -F : '$1 == "keyspace_misses" {print $2}')
