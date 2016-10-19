@@ -16,7 +16,7 @@ class collectd::plugin::elasticsearch
     group   => '0',
     mode    => '0644',
     owner   => '0',
-    source  => 'puppet:///modules/collectd/plugin/elasticsearch.conf',
+    source  => template('collectd/elasticsearch.conf.erb'),
     require => File['/usr/local/collectd-plugins/elasticsearch.py'],
     notify  => Service['collectd'],
   }
