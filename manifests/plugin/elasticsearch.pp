@@ -1,5 +1,8 @@
 #class collectd::plugin::elasticsearch
-class collectd::plugin::elasticsearch
+class collectd::plugin::elasticsearch (
+  $es_clustername     = 'elasticsearch',
+  $enable_index_stats = false,
+)
 {
 
   include collectd::plugin::python
@@ -16,7 +19,7 @@ class collectd::plugin::elasticsearch
     group   => '0',
     mode    => '0644',
     owner   => '0',
-    source  => template('collectd/elasticsearch.conf.erb'),
+    content => template('collectd/elasticsearch.conf.erb'),
     require => File['/usr/local/collectd-plugins/elasticsearch.py'],
     notify  => Service['collectd'],
   }
