@@ -1,0 +1,14 @@
+### File managed by Puppet ###
+### Served by:       '<%= scope.lookupvar('::servername') %>'
+### Module:          '<%= scope.to_hash['module_name'] %>'
+### Template source: '<%= template_source %>'
+
+<LoadPlugin exec>
+    Globals <%= @globals %>
+
+<% if @interval -%>
+    Interval <%= @interval %>
+<% end -%>
+</LoadPlugin>
+
+<Plugin exec>
