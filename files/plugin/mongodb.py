@@ -14,7 +14,7 @@
 
 import collectd
 import socket
-import mongo
+import pymongo
 from pymongo import MongoClient
 from pymongo.read_preferences import ReadPreference
 from distutils.version import StrictVersion as V
