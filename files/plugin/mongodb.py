@@ -14,6 +14,7 @@
 
 import collectd
 import socket
+import mongo
 from pymongo import MongoClient
 from pymongo.read_preferences import ReadPreference
 from distutils.version import StrictVersion as V
@@ -154,7 +155,7 @@ class MongoDB(object):
         try:
             rs_status = con.admin.command("replSetGetStatus")
         except pymongo.errors.OperationFailure, e:
-            if e.code == None and str(e).find('failed: not running with --replSet"'):
+            if e.code == None and str(e).find('not running with --replSet"'):
                 print "OK - Not running with replSet"
                 con.disconnect()
                 return 0
