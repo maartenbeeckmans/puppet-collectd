@@ -155,7 +155,7 @@ class MongoDB(object):
         try:
             rs_status = con.admin.command("replSetGetStatus")
         except pymongo.errors.OperationFailure, e:
-            if e.code == None and str(e).find('not running with --replSet"'):
+            if str(e).find('not running with --replSet"'):
                 print "OK - Not running with replSet"
                 con.disconnect()
                 return 0
