@@ -20,44 +20,44 @@ while sleep "$INTERVAL"; do
   ########################
 
   JSTAT_RESULTS=(`$JSTAT -gcutil $PID`)
-  echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_s0\" interval=$INTERVAL N:${JSTAT_RESULTS[11]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_s1\" interval=$INTERVAL N:${JSTAT_RESULTS[12]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_e\" interval=$INTERVAL N:${JSTAT_RESULTS[13]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_p\" interval=$INTERVAL N:${JSTAT_RESULTS[15]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_o\" interval=$INTERVAL N:${JSTAT_RESULTS[14]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_survivor0_s0\" interval=$INTERVAL N:${JSTAT_RESULTS[11]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_survivor1_s1\" interval=$INTERVAL N:${JSTAT_RESULTS[12]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_eden_e\" interval=$INTERVAL N:${JSTAT_RESULTS[13]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_old_o\" interval=$INTERVAL N:${JSTAT_RESULTS[14]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_metaspace_m\" interval=$INTERVAL N:${JSTAT_RESULTS[15]}"
 
   # derive
-  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/cache_operation-ygc\" interval=$INTERVAL N:${JSTAT_RESULTS[17]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/cache_operation-fgc\" interval=$INTERVAL N:${JSTAT_RESULTS[19]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/derive-young_gc_ygc\" interval=$INTERVAL N:${JSTAT_RESULTS[17]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/derive-full_gc_fgc\" interval=$INTERVAL N:${JSTAT_RESULTS[19]}"
   # gauge
-  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/count-ygc\" interval=$INTERVAL N:${JSTAT_RESULTS[17]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/count-fgc\" interval=$INTERVAL N:${JSTAT_RESULTS[19]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/count-young_gc_ygc\" interval=$INTERVAL N:${JSTAT_RESULTS[17]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/count-full_gc_fgc\" interval=$INTERVAL N:${JSTAT_RESULTS[19]}"
 
   # derive
-  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/cache_operation-ygct\" interval=$INTERVAL N:${JSTAT_RESULTS[17]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/cache_operation-fgct\" interval=$INTERVAL N:${JSTAT_RESULTS[19]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/derive-young_gc_time_ygct\" interval=$INTERVAL N:${JSTAT_RESULTS[17]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/derive-full_gc_time_fgct\" interval=$INTERVAL N:${JSTAT_RESULTS[19]}"
   # gauge
-  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/count-ygct\" interval=$INTERVAL N:${JSTAT_RESULTS[17]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/count-fgct\" interval=$INTERVAL N:${JSTAT_RESULTS[19]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/count-young_gc_time_ygct\" interval=$INTERVAL N:${JSTAT_RESULTS[17]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gccount-$PROGRAM/count-full_gc_time_fgct\" interval=$INTERVAL N:${JSTAT_RESULTS[19]}"
 
   # GC
   ####
 
   JSTAT_RESULTS=(`$JSTAT -gc $PID`)
   # capacity
-  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/capacity-s0c\" interval=$INTERVAL N:${JSTAT_RESULTS[17]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/capacity-s1c\" interval=$INTERVAL N:${JSTAT_RESULTS[18]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/capacity-ec\" interval=$INTERVAL N:${JSTAT_RESULTS[21]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/capacity-oc\" interval=$INTERVAL N:${JSTAT_RESULTS[23]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/capacity-mc\" interval=$INTERVAL N:${JSTAT_RESULTS[25]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/capacity-ccsc\" interval=$INTERVAL N:${JSTAT_RESULTS[27]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-survivor0_capacity_s0c\" interval=$INTERVAL N:${JSTAT_RESULTS[17]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-survivor1_capacity_s1c\" interval=$INTERVAL N:${JSTAT_RESULTS[18]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-eden_capacity_ec\" interval=$INTERVAL N:${JSTAT_RESULTS[21]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-old_capacity_oc\" interval=$INTERVAL N:${JSTAT_RESULTS[23]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-metaspace_capacity_mc\" interval=$INTERVAL N:${JSTAT_RESULTS[25]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-compressed_class_capacity_ccsc\" interval=$INTERVAL N:${JSTAT_RESULTS[27]}"
   # used
-  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-s0u\" interval=$INTERVAL N:${JSTAT_RESULTS[19]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-s1u\" interval=$INTERVAL N:${JSTAT_RESULTS[20]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-eu\" interval=$INTERVAL N:${JSTAT_RESULTS[22]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-ou\" interval=$INTERVAL N:${JSTAT_RESULTS[24]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-mu\" interval=$INTERVAL N:${JSTAT_RESULTS[26]}"
-  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-ccsu\" interval=$INTERVAL N:${JSTAT_RESULTS[28]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-survivor0_used_s0u\" interval=$INTERVAL N:${JSTAT_RESULTS[19]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-survivor1_used_s1u\" interval=$INTERVAL N:${JSTAT_RESULTS[20]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-eden_used_eu\" interval=$INTERVAL N:${JSTAT_RESULTS[22]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-old_used_ou\" interval=$INTERVAL N:${JSTAT_RESULTS[24]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-metaspace_used_mu\" interval=$INTERVAL N:${JSTAT_RESULTS[26]}"
+  echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-compressed_class_used_ccsu\" interval=$INTERVAL N:${JSTAT_RESULTS[28]}"
 
 
 done
