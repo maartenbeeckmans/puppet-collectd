@@ -1,0 +1,4 @@
+LoadPlugin exec
+<Plugin exec>
+  Exec "<%= @user %>" "/usr/local/collectd-plugins/jstat.sh" "<%= @process_name %>"
+</Plugin>
