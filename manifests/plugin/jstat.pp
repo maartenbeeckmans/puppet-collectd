@@ -2,7 +2,14 @@
 define collectd::plugin::jstat (
   $user,
   $process_name = $title,
+  $java_version = '1.8.0',
 ) {
+
+  if !defined(Package["java-${java_version}-openjdk-devel"]) {
+    package { "java-${java_version}-openjdk-devel":
+      ensure => present,
+    }
+  }
 
   if !defined(File['/usr/local/collectd-plugins/jstat.sh']) {
     file { '/usr/local/collectd-plugins/jstat.sh':
