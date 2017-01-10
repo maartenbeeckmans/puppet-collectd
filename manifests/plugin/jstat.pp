@@ -8,6 +8,7 @@ define collectd::plugin::jstat (
   if !defined(Package["java-${java_version}-openjdk-devel"]) {
     package { "java-${java_version}-openjdk-devel":
       ensure => present,
+      notify => Service['collectd'],
     }
   }
 
@@ -18,6 +19,7 @@ define collectd::plugin::jstat (
       mode   => '0755',
       owner  => 'root',
       source => 'puppet:///modules/collectd/plugin/jstat.sh',
+      notify => Service['collectd'],
     }
   }
 
