@@ -1,3 +1,4 @@
+#
 class collectd::plugin::iostat
 {
 
@@ -16,7 +17,7 @@ class collectd::plugin::iostat
   }
 
   file { '/etc/collectd.d/iostat.conf':
-    ensure => 'file',
+    ensure  => 'file',
     group   => '0',
     mode    => '0644',
     owner   => '0',

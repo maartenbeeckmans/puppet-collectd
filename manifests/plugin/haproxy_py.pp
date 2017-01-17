@@ -1,6 +1,7 @@
+#
 class collectd::plugin::haproxy_py {
-	
-	file { '/etc/collectd.d/haproxy_py.conf':
+
+  file { '/etc/collectd.d/haproxy_py.conf':
     ensure => 'file',
     group  => 'root',
     mode   => '0644',
