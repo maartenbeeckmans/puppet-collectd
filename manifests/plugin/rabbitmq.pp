@@ -4,7 +4,13 @@ class collectd::plugin::rabbitmq (
   $collectd_rabbitmq_password = hiera('collectd_rabbitmq_password', ''),
 ) {
 
-  package { 'collectd-perl':
+  if $::operatingsystemmajrelease == '6' {
+    $_collect_perl_package = 'collectd-perl'
+  } else {
+    $_collect_perl_package = 'perl-Collectd'
+  }
+
+  package { $_collect_perl_package:
     ensure => 'present',
   }
 
