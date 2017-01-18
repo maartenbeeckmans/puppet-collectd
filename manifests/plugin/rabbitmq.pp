@@ -25,19 +25,19 @@ class collectd::plugin::rabbitmq (
     notify  => Service['collectd'],
   }
   file { '/usr/local/collectd-plugins/collectd_rabbitmq/rabbit.py':
-    source  => 'puppet:///modules/collectd/plugin/collectd_rabbitmq/rabbit.py',
+    source  => 'puppet:///modules/collectd/plugin/rabbitmq/rabbit.py',
     mode    => '0644',
     require => File['/usr/local/collectd-plugins/collectd_rabbitmq'],
     notify  => Service['collectd'],
   }
   file { '/usr/local/collectd-plugins/collectd_rabbitmq/utils.py':
-    source  => 'puppet:///modules/collectd/plugin/collectd_rabbitmq/utils.py',
+    source  => 'puppet:///modules/collectd/plugin/rabbitmq/utils.py',
     mode    => '0644',
     require => File['/usr/local/collectd-plugins/collectd_rabbitmq'],
     notify  => Service['collectd'],
   }
-  file { '/usr/share/collectd/types.db.collectd_rabbitmq':
-    source  => 'puppet:///modules/collectd/plugin/collectd_rabbitmq/types.db.rabbitmq',
+  file { '/usr/share/collectd/types.db.rabbitmq':
+    source  => 'puppet:///modules/collectd/plugin/rabbitmq/types.db.rabbitmq',
     mode    => '0644',
     require => Package['collectd'],
     notify  => Service['collectd'],
