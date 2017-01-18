@@ -1,6 +1,6 @@
 # This file is managed by puppet
 
-TypesDB "/usr/local/share/types.db.rabbitmq"
+TypesDB "/usr/share/collectd/types.db.rabbitmq"
 
 LoadPlugin python
 
@@ -8,10 +8,10 @@ LoadPlugin python
   LogTraces true
   Interactive false
 
-  ModulePath "/usr/local/collectd-plugins/rabbitmq/"
-  Import "collectd_plugin"
+  ModulePath "/usr/local/collectd-plugins/"
+  Import "collectd_rabbitmq.collectd_plugin"
 
-  <Module "collectd_plugin">
+  <Module "collectd_rabbitmq.collectd_plugin">
 
     Username "<%= @collectd_rabbitmq_user %>"
     Password "<%= @collectd_rabbitmq_password %>"

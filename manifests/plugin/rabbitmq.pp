@@ -4,7 +4,7 @@ class collectd::plugin::rabbitmq (
   $collectd_rabbitmq_password = hiera('collectd_rabbitmq_password', ''),
 ) {
 
-  file { '/usr/local/collectd-plugins/rabbitmq':
+  file { '/usr/local/collectd-plugins/collectd_rabbitmq':
     ensure  => 'directory',
     group   => '0',
     mode    => '0755',
@@ -12,32 +12,32 @@ class collectd::plugin::rabbitmq (
     require => File['/usr/local/collectd-plugins/'],
     notify  => Service['collectd'],
   }
-  file { '/usr/local/collectd-plugins/rabbitmq/__init__.py':
+  file { '/usr/local/collectd-plugins/collectd_rabbitmq/__init__.py':
     source  => 'puppet:///modules/collectd/plugin/rabbitmq/__init__.py',
     mode    => '0644',
-    require => File['/usr/local/collectd-plugins/rabbitmq'],
+    require => File['/usr/local/collectd-plugins/collectd_rabbitmq'],
     notify  => Service['collectd'],
   }
-  file { '/usr/local/collectd-plugins/rabbitmq/collectd_plugin.py':
+  file { '/usr/local/collectd-plugins/collectd_rabbitmq/collectd_plugin.py':
     source  => 'puppet:///modules/collectd/plugin/rabbitmq/collectd_plugin.py',
     mode    => '0644',
-    require => File['/usr/local/collectd-plugins/rabbitmq'],
+    require => File['/usr/local/collectd-plugins/collectd_rabbitmq'],
     notify  => Service['collectd'],
   }
-  file { '/usr/local/collectd-plugins/rabbitmq/rabbit.py':
-    source  => 'puppet:///modules/collectd/plugin/rabbitmq/rabbit.py',
+  file { '/usr/local/collectd-plugins/collectd_rabbitmq/rabbit.py':
+    source  => 'puppet:///modules/collectd/plugin/collectd_rabbitmq/rabbit.py',
     mode    => '0644',
-    require => File['/usr/local/collectd-plugins/rabbitmq'],
+    require => File['/usr/local/collectd-plugins/collectd_rabbitmq'],
     notify  => Service['collectd'],
   }
-  file { '/usr/local/collectd-plugins/rabbitmq/utils.py':
-    source  => 'puppet:///modules/collectd/plugin/rabbitmq/utils.py',
+  file { '/usr/local/collectd-plugins/collectd_rabbitmq/utils.py':
+    source  => 'puppet:///modules/collectd/plugin/collectd_rabbitmq/utils.py',
     mode    => '0644',
-    require => File['/usr/local/collectd-plugins/rabbitmq'],
+    require => File['/usr/local/collectd-plugins/collectd_rabbitmq'],
     notify  => Service['collectd'],
   }
-  file { '/usr/share/collectd/types.db.rabbitmq':
-    source  => 'puppet:///modules/collectd/plugin/rabbitmq/types.db.rabbitmq',
+  file { '/usr/share/collectd/types.db.collectd_rabbitmq':
+    source  => 'puppet:///modules/collectd/plugin/collectd_rabbitmq/types.db.rabbitmq',
     mode    => '0644',
     require => Package['collectd'],
     notify  => Service['collectd'],
