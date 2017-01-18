@@ -1,17 +1,30 @@
-<LoadPlugin "perl">
-  Globals true
-</LoadPlugin>
+# This file is managed by puppet
 
-<Plugin "perl">
-  IncludeDir "/usr/local/collectd-plugins"
-  BaseName "Collectd::Plugins"
-  LoadPlugin "RabbitMQ"
+TypesDB "/usr/local/share/types.db.rabbitmq"
 
-  <Plugin "RabbitMQ">
+LoadPlugin python
+
+<Plugin python>
+  LogTraces true
+  Interactive false
+
+  ModulePath "/usr/local/collectd-plugins/rabbitmq/"
+  Import "collectd_plugin"
+
+  <Module "collectd_plugin">
+
     Username "<%= @collectd_rabbitmq_user %>"
     Password "<%= @collectd_rabbitmq_password %>"
     Realm "RabbitMQ Management"
     Host "localhost"
     Port "15672"
-  </Plugin>
+
+#    <Ignore "queue">
+#      Regex "^amq"
+#    </Ignore>
+#    <Ignore "exchange">
+#      Regex "my-exchange"
+#    </Ignore>
+
+  </Module>
 </Plugin>
