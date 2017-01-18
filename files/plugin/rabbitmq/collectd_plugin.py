@@ -17,6 +17,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
+#
+#  kayn: This version was slightly modified to the need of Inuits!
+
 
 """
 This module controls the interactions with collectd
@@ -25,6 +29,7 @@ This module controls the interactions with collectd
 import collectd
 import re
 import urllib
+import socket
 
 from collectd_rabbitmq import rabbit
 from collectd_rabbitmq import utils
@@ -42,6 +47,7 @@ def configure(config_values):
     data_to_ignore = dict()
     scheme = 'http'
     vhost_prefix = None
+    hostname = socket.gethostname()
 
     for config_value in config_values.children:
         collectd.debug("%s = %s" % (config_value.key, config_value.values))
@@ -52,6 +58,8 @@ def configure(config_values):
                 password = config_value.values[0]
             elif config_value.key == 'Host':
                 host = config_value.values[0]
+            elif config_value.key == 'Hostname':
+                hostname = config_value.values[0]
             elif config_value.key == 'Port':
                 port = config_value.values[0]
             elif config_value.key == 'Realm':
@@ -306,9 +314,15 @@ class CollectdPlugin(object):
         collectd.debug("Dispatching %s values: %s" % (path, values))
 
         metric = collectd.Values()
-        metric.host = host
 
-        metric.plugin = plugin
+        # kayn: the host has to be hostname and not some general value
+        # which messes up the graphite. The value of 'host' varible was
+        # added to the following element 'plugin'.
+        #metric.host = host
+        metric.host = hostname
+
+        #metric.plugin = plugin
+        metric.plugin = host + '.' + plugin
 
         if plugin_instance:
             metric.plugin_instance = plugin_instance

@@ -2,7 +2,12 @@
 class collectd::plugin::rabbitmq (
   $collectd_rabbitmq_user     = hiera('collectd_rabbitmq_user', ''),
   $collectd_rabbitmq_password = hiera('collectd_rabbitmq_password', ''),
+  $ignore_queues_regexp       = [],
+  $ignore_exchanges_regexp    = [],
 ) {
+
+  validate_array($ignore_queues_regexp)
+  validate_array($ignore_exchanges_regexp)
 
   file { '/usr/local/collectd-plugins/collectd_rabbitmq':
     ensure  => 'directory',

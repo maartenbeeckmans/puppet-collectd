@@ -16,15 +16,21 @@ LoadPlugin python
     Username "<%= @collectd_rabbitmq_user %>"
     Password "<%= @collectd_rabbitmq_password %>"
     Realm "RabbitMQ Management"
+#    Hostname "<%= scope.lookupvar('::hostname') %>
     Host "localhost"
     Port "15672"
 
-#    <Ignore "queue">
-#      Regex "^amq"
-#    </Ignore>
-#    <Ignore "exchange">
-#      Regex "my-exchange"
-#    </Ignore>
+    <Ignore "queue">
+<% @ignore_queues_regexp.each do |reg| -%>
+      Regex "<%= reg %>"
+<% end -%>
+    </Ignore>
+
+    <Ignore "exchange">
+<% @ignore_exchanges_regexp.each do |exchange| -%>
+      Regex "<%= exchange %>"
+<% end -%>
+    </Ignore>
 
   </Module>
 </Plugin>
