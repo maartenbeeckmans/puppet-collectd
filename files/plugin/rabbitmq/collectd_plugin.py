@@ -47,7 +47,6 @@ def configure(config_values):
     data_to_ignore = dict()
     scheme = 'http'
     vhost_prefix = None
-    hostname = socket.gethostname()
 
     for config_value in config_values.children:
         collectd.debug("%s = %s" % (config_value.key, config_value.values))
@@ -58,8 +57,6 @@ def configure(config_values):
                 password = config_value.values[0]
             elif config_value.key == 'Host':
                 host = config_value.values[0]
-            elif config_value.key == 'Hostname':
-                hostname = config_value.values[0]
             elif config_value.key == 'Port':
                 port = config_value.values[0]
             elif config_value.key == 'Realm':
@@ -319,7 +316,8 @@ class CollectdPlugin(object):
         # which messes up the graphite. The value of 'host' varible was
         # added to the following element 'plugin'.
         #metric.host = host
-        metric.host = hostname
+
+        metric.host = socket.gethostname()
 
         #metric.plugin = plugin
         metric.plugin = host + '.' + plugin
