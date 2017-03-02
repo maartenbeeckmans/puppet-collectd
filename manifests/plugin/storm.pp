@@ -7,7 +7,7 @@ class collectd::plugin::storm(
   file { '/usr/local/collectd-plugins/storm.rb':
     ensure => 'file',
     group  => 'root',
-    mode   => '0644',
+    mode   => '0755',
     owner  => 'root',
     source => 'puppet:///modules/collectd/plugin/storm.rb',
     notify => Service['collectd'],
