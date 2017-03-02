@@ -1,7 +1,7 @@
 # class collectd::plugin::storm
 class collectd::plugin::storm(
-  host='localhost',
-  port=8888,
+  $host = 'localhost',
+  $port = 8888,
 ){
 
   file { '/usr/local/collectd-plugins/storm.rb':
