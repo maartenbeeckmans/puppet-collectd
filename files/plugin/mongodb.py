@@ -209,8 +209,6 @@ class MongoDB(object):
                 lag = float(optime_lag.seconds + optime_lag.days * 24 * 3600)
 
             # send message with lag
-            message = "Lag is " + str(lag) + " seconds"
-            print message
             self.submit('replication', 'lag-seconds', str(lag))
 
             # send message with lag in percentage
@@ -225,8 +223,6 @@ class MongoDB(object):
                 lag = int(float(lag) / float(primary_timediff) * 100)
             else:
                 lag = 0
-            message = "Lag is " + str(lag) + " percents"
-            print message
             self.submit('replication', 'lag-percentage', str(lag))
             con_primary.disconnect()
             con.disconnect()
