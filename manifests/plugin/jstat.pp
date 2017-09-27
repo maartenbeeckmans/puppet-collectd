@@ -24,10 +24,10 @@ define collectd::plugin::jstat (
     }
   }
 
-  $_process_name = regsubst($process_name, '/', '_', 'G')
+  $_process_name = regsubst($process_name, '[/\.]', '_', 'G')
 
   if $sudo {
-    sudo::conf{"jstat_${_process_name}.conf":
+    sudo::conf{"jstat_${_process_name}":
       content => "#puppet\nDefaults:${user} !requiretty
       ${user} ALL=(ALL) NOPASSWD:/bin/jps,/bin/jstat\n",
     }
