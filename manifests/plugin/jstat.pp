@@ -23,7 +23,9 @@ define collectd::plugin::jstat (
     }
   }
 
-  file { "/etc/collectd.d/jstat_${process_name}.conf":
+  $_process_name = regsubst($process_name, '/', '_', 'G')
+
+  file { "/etc/collectd.d/jstat_${_process_name}.conf":
     ensure  => 'file',
     group   => '0',
     mode    => '0644',
