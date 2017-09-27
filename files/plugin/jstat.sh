@@ -6,27 +6,25 @@
 
 [[ $# -eq 1 ]] || { echo 'The wrong number of arguments, exiting...'; exit 1; }
 
-JSTAT=$(which jstat)
 HOSTNAME="${COLLECTD_HOSTNAME:-`hostname -f`}"
 INTERVAL="${COLLECTD_INTERVAL:-60}"
 PROGRAM=$(echo $1|tr '.' '_'|tr '/' '_')
 SUDO=''
 
-[[ -x "$JSTAT" ]] || { echo 'jstat not found, exiting...'; exit 2; }
+[[ -x '/bin/jstat' ]] || { echo 'jstat not found, exiting...'; exit 2; }
 
 while sleep "$INTERVAL"; do
-  PID=$(jps -l | grep "$1" | cut -d ' ' -f1)
 
-  # try to run jps with sudo
-  if [[ "$PID" =~ '^[0-9]+$' ]];then
-    PID=$(sudo jps -l | grep "$1" | cut -d ' ' -f1)
-    SUDO=sudo
-  fi
+  PID=$(/bin/jps -l | grep "$1" | cut -d ' ' -f1)
+
+  # try to run jps with sudo when PID is not a number
+  [[ "$PID" =~ '^[0-9]+$' ]] || { PID=$(sudo /bin/jps -l | grep "$1" | cut -d ' ' -f1); SUDO=sudo ; }
+
 
   # GC util + count + time
   ########################
 
-  JSTAT_RESULTS=(`$SUDO $JSTAT -gcutil $PID`)
+  JSTAT_RESULTS=(`$SUDO /bin/jstat -gcutil $PID`)
   echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_survivor0_s0\" interval=$INTERVAL N:${JSTAT_RESULTS[11]}"
   echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_survivor1_s1\" interval=$INTERVAL N:${JSTAT_RESULTS[12]}"
   echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_eden_e\" interval=$INTERVAL N:${JSTAT_RESULTS[13]}"
@@ -50,7 +48,7 @@ while sleep "$INTERVAL"; do
   # GC
   ####
 
-  JSTAT_RESULTS=(`$JSTAT -gc $PID`)
+  JSTAT_RESULTS=(`$SUDO /bin/jstat -gc $PID`)
   # capacity
   echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-survivor0_capacity_s0c\" interval=$INTERVAL N:${JSTAT_RESULTS[17]}"
   echo "PUTVAL \"$HOSTNAME/jvm-gc-$PROGRAM/bytes-survivor1_capacity_s1c\" interval=$INTERVAL N:${JSTAT_RESULTS[18]}"
