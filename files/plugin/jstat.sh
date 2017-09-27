@@ -24,7 +24,10 @@ while sleep "$INTERVAL"; do
   # GC util + count + time
   ########################
 
-  JSTAT_RESULTS=(`$SUDO /bin/jstat -gcutil $PID`)
+  # run jstat only when PID is a number
+  [[ "$PID" =~ '^[0-9]+$' ]] && JSTAT_RESULTS=(`$SUDO /bin/jstat -gcutil $PID`)
+  [[ $? -ne 0 ]] && continue
+
   echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_survivor0_s0\" interval=$INTERVAL N:${JSTAT_RESULTS[11]}"
   echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_survivor1_s1\" interval=$INTERVAL N:${JSTAT_RESULTS[12]}"
   echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_eden_e\" interval=$INTERVAL N:${JSTAT_RESULTS[13]}"
