@@ -9,7 +9,7 @@
 JSTAT=$(which jstat)
 HOSTNAME="${COLLECTD_HOSTNAME:-`hostname -f`}"
 INTERVAL="${COLLECTD_INTERVAL:-60}"
-PROGRAM=$(echo $1|tr '.' '_')
+PROGRAM=$(echo $1|tr '.' '_'|tr '/' '_')
 
 [[ -x "$JSTAT" ]] || { echo 'jstat not found, exiting...'; exit 2; }
 
