@@ -1,4 +1,4 @@
 LoadPlugin exec
 <Plugin exec>
-  Exec "<%= @user %>" "/usr/local/collectd-plugins/jstat.sh" "<%= @process_name %>"
+  Exec "<%= @user %>" "/usr/local/collectd-plugins/jstat.sh" <% if @sudo -%>"--sudo" <% end -%>"<%= @process_name %>"
 </Plugin>
