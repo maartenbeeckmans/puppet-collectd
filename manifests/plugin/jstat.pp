@@ -3,6 +3,7 @@ define collectd::plugin::jstat (
   $user,
   $process_name = $title,
   $java_version = '1.8.0',
+  $sudo         = false,
 ) {
 
   if !defined(Package["java-${java_version}-openjdk-devel"]) {
@@ -24,6 +25,13 @@ define collectd::plugin::jstat (
   }
 
   $_process_name = regsubst($process_name, '/', '_', 'G')
+
+  if $sudo {
+    sudo::conf{"jstat_${_process_name}":
+      content => "#puppet\nDefaults:${user} !requiretty
+      ${user} ALL=(ALL) NOPASSWD:/bin/jps,/bin/jstat\n",
+    }
+  }
 
   file { "/etc/collectd.d/jstat_${_process_name}.conf":
     ensure  => 'file',

@@ -10,16 +10,23 @@ JSTAT=$(which jstat)
 HOSTNAME="${COLLECTD_HOSTNAME:-`hostname -f`}"
 INTERVAL="${COLLECTD_INTERVAL:-60}"
 PROGRAM=$(echo $1|tr '.' '_'|tr '/' '_')
+SUDO=''
 
 [[ -x "$JSTAT" ]] || { echo 'jstat not found, exiting...'; exit 2; }
 
 while sleep "$INTERVAL"; do
   PID=$(jps -l | grep "$1" | cut -d ' ' -f1)
 
+  # try to run jps with sudo
+  if [[ "$PID" =~ '^[0-9]+$' ]];then
+    PID=$(sudo jps -l | grep "$1" | cut -d ' ' -f1)
+    SUDO=sudo
+  fi
+
   # GC util + count + time
   ########################
 
-  JSTAT_RESULTS=(`$JSTAT -gcutil $PID`)
+  JSTAT_RESULTS=(`$SUDO $JSTAT -gcutil $PID`)
   echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_survivor0_s0\" interval=$INTERVAL N:${JSTAT_RESULTS[11]}"
   echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_survivor1_s1\" interval=$INTERVAL N:${JSTAT_RESULTS[12]}"
   echo "PUTVAL \"$HOSTNAME/jvm-gcutil-$PROGRAM/percent-used_eden_e\" interval=$INTERVAL N:${JSTAT_RESULTS[13]}"
