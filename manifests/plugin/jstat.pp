@@ -27,7 +27,7 @@ define collectd::plugin::jstat (
   $_process_name = regsubst($process_name, '/', '_', 'G')
 
   if $sudo {
-    sudo::conf{"jstat_${_process_name}":
+    sudo::conf{"jstat_${_process_name}.conf":
       content => "#puppet\nDefaults:${user} !requiretty
       ${user} ALL=(ALL) NOPASSWD:/bin/jps,/bin/jstat\n",
     }
