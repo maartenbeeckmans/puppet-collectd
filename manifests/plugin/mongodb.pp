@@ -1,42 +1,33 @@
-# class collectd::plugin::mongodb
-class collectd::plugin::mongodb(
-  $mongod_bind_ip = '127.0.0.1',
+# define collectd::plugin::mongodb
+define collectd::plugin::mongodb(
+  $mongod_bind_ip   = '127.0.0.1',
+  $mongod_bind_port = '27017',
 ){
 
   include ::collectd::plugin::python
 
-  if !defined(Package['python-pymongo']) {
-    package { 'python-pymongo':
-      ensure   => present,
-    }
-  }
+  ensure_resource('package', 'python-pymongo', {
+    ensure   => present,
+  })
 
-#  file { '/usr/local/collectd-plugins':
-#    ensure => 'directory',
-#    group  => 'root',
-#    mode   => '0644',
-#    owner  => 'root',
-#  }
-
-  file { '/usr/local/collectd-plugins/mongodb.py':
+  ensure_resource('file', '/usr/local/collectd-plugins/mongodb.py', {
     ensure => 'file',
     group  => 'root',
     mode   => '0644',
     owner  => 'root',
     source => 'puppet:///modules/collectd/plugin/mongodb.py',
     notify => Service['collectd'],
-  }
+  })
 
-  file_line { 'mongoline':
+  ensure_resource( 'file_line', 'mongoline', {
     ensure => present,
     line   => 'replication             value:GAUGE:U:U',
     match  => '^replication\s+',
     path   => '/usr/share/collectd/types.db',
     notify => Service['collectd'],
-  }
+  })
 
-
-  file { '/etc/collectd.d/mongodb.conf':
+  file { "/etc/collectd.d/mongodb_${mongod_bind_port}.conf":
     ensure  => 'file',
     group   => '0',
     mode    => '0644',
