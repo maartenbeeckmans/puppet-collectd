@@ -15,8 +15,8 @@
     # mongodb.py is at path /usr/local/collectd-plugins/mongodb.py
     ModulePath "/usr/local/collectd-plugins/"
 
-    Import "mongodb"
-    <Module mongodb>
+    Import "mongodb_<%= @mongod_bind_port %>"
+    <Module mongodb_<%= @mongod_bind_port %>>
         Host "<%= @mongod_bind_ip %>"
         Port "<%= @mongod_bind_port %>"
     </Module>

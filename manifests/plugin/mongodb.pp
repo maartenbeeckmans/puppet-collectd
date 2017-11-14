@@ -10,15 +10,6 @@ define collectd::plugin::mongodb(
     ensure   => present,
   })
 
-  ensure_resource('file', '/usr/local/collectd-plugins/mongodb.py', {
-    ensure => 'file',
-    group  => 'root',
-    mode   => '0644',
-    owner  => 'root',
-    source => 'puppet:///modules/collectd/plugin/mongodb.py',
-    notify => Service['collectd'],
-  })
-
   ensure_resource( 'file_line', 'mongoline', {
     ensure => present,
     line   => 'replication             value:GAUGE:U:U',
@@ -26,6 +17,18 @@ define collectd::plugin::mongodb(
     path   => '/usr/share/collectd/types.db',
     notify => Service['collectd'],
   })
+
+  # This collectd plugin cannot be called twice and I need to monitor
+  # multiple mongo instances on the same host. Hence this script exists
+  # for every port and it's still the same :)
+  file { "/usr/local/collectd-plugins/mongodb_${mongod_bind_port}.py":
+    ensure => 'file',
+    group  => 'root',
+    mode   => '0644',
+    owner  => 'root',
+    source => 'puppet:///modules/collectd/plugin/mongodb.py',
+    notify => Service['collectd'],
+  }
 
   file { "/etc/collectd.d/mongodb_${mongod_bind_port}.conf":
     ensure  => 'file',
@@ -35,7 +38,7 @@ define collectd::plugin::mongodb(
     content => template('collectd/mongodb.conf.erb'),
     require => [
       Package['python-pymongo'],
-      File['/usr/local/collectd-plugins/mongodb.py'],
+      File["/usr/local/collectd-plugins/mongodb_${mongod_bind_port}.py"],
       File_line['mongoline']
     ],
     notify  => Service['collectd'],
