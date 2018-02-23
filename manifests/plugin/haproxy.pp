@@ -35,6 +35,4 @@ class collectd::plugin::haproxy {
     source => 'puppet:///modules/collectd/plugin/exec.conf',
     notify => Service['collectd'],
   }
-
 }
-
