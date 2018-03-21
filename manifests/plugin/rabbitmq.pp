@@ -9,9 +9,9 @@ class collectd::plugin::rabbitmq (
   validate_array($ignore_queues_regexp)
   validate_array($ignore_exchanges_regexp)
 
-  package { 'collectd-perl':
-    ensure => 'present',
-  }
+  #package { 'collectd-perl':
+  #  ensure => 'present',
+  #}
 
   file { '/usr/local/collectd-plugins/collectd_rabbitmq':
     ensure  => 'directory',
@@ -61,18 +61,18 @@ class collectd::plugin::rabbitmq (
     notify  => Service['collectd'],
   }
 
-  file { '/usr/local/collectd-plugins/Collectd/Plugins/':
-    ensure  => 'directory',
-    group   => '0',
-    mode    => '0755',
-    owner   => '0',
-    require => File['/usr/local/collectd-plugins/Collectd'],
-  }
-  file { '/usr/local/collectd-plugins/Collectd/Plugins/RabbitMQ.pm':
-    source  => 'puppet:///modules/collectd/RabbitMQ.pm',
-    mode    => '0644',
-    require => File['/usr/local/collectd-plugins/Collectd/Plugins'],
-  }
+  #file { '/usr/local/collectd-plugins/Collectd/Plugins/':
+  #  ensure  => 'directory',
+  #  group   => '0',
+  #  mode    => '0755',
+  #   owner   => '0',
+  #  require => File['/usr/local/collectd-plugins/Collectd'],
+  #}
+  #file { '/usr/local/collectd-plugins/Collectd/Plugins/RabbitMQ.pm':
+  #  source  => 'puppet:///modules/collectd/RabbitMQ.pm',
+  #  mode    => '0644',
+  #  require => File['/usr/local/collectd-plugins/Collectd/Plugins'],
+  #}
 
   file_line { 'cpusummaryline':
     path    => '/usr/share/collectd/types.db',
