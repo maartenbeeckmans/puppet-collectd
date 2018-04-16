@@ -13,23 +13,24 @@ class collectd::plugin::storm(
     notify => Service['collectd'],
   }
 
+  File_line {
+    path   => '/usr/share/collectd/types.db',
+    notify => Service['collectd'],
+  }
+
   file_line {
     'storm_acked':
-      path   => '/usr/share/collectd/types.db',
-      line   => 'storm_acked            value:COUNTER:0:U',
-      notify => Service['collectd'];
+      line  => 'storm_acked            value:COUNTER:0:U',
+      match => '^storm_acked ';
     'storm_latency':
-      path   => '/usr/share/collectd/types.db',
-      line   => 'storm_latency          value:GAUGE:0:U',
-      notify => Service['collectd'];
+      line  => 'storm_latency          value:GAUGE:0:U',
+      match => '^storm_latency ';
     'storm_emitted':
-      path   => '/usr/share/collectd/types.db',
-      line   => 'storm_emitted          value:GAUGE:0:U',
-      notify => Service['collectd'];
+      line  => 'storm_emitted          value:GAUGE:0:U',
+      match => '^storm_emitted ';
     'storm_transferred':
-      path   => '/usr/share/collectd/types.db',
-      line   => 'storm_transferred      value:GAUGE:0:U',
-      notify => Service['collectd'];
+      line  => 'storm_transferred      value:GAUGE:0:U',
+      match => '^storm_transferred ';
   }
 
   file { '/etc/collectd.d/storm.conf':
