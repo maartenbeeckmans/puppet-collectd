@@ -76,6 +76,7 @@ while true do
                 http.request(req)}
                 json = JSON.parse(res.body)
 
+                puts "PUTVAL #{hostname}/storm-topologies/storm_acked-#{topology['name']} #{start_run}:#{json['spouts'][0]['acked']}"
                 puts "PUTVAL #{hostname}/storm-topologies/storm_latency-#{topology['name']} #{start_run}:#{json['topologyStats'][0]['completeLatency']}"
                 puts "PUTVAL #{hostname}/storm-topologies/storm_transferred-#{topology['name']} #{start_run}:#{json['topologyStats'][0]['transferred']}"
                 puts "PUTVAL #{hostname}/storm-topologies/storm_emitted-#{topology['name']} #{start_run}:#{json['topologyStats'][0]['emitted']}"

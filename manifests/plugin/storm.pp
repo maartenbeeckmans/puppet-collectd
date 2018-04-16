@@ -14,9 +14,13 @@ class collectd::plugin::storm(
   }
 
   file_line { 
+    'storm_acked':
+      path    => '/usr/share/collectd/types.db',
+      line    => 'storm_acked            value:COUNTER:0:U',
+      notify  => Service['collectd'];
     'storm_latency':
       path    => '/usr/share/collectd/types.db',
-      line    => 'storm_latency         value:GAUGE:0:U', 
+      line    => 'storm_latency          value:GAUGE:0:U',
       notify  => Service['collectd'];
    'storm_emitted':
       path    => '/usr/share/collectd/types.db',
