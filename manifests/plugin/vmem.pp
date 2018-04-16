@@ -1,5 +1,6 @@
+#
 class collectd::plugin::vmem (
-  $verbose = 'true',
+  $verbose = true,
 ) {
   file { '/etc/collectd.d/vmem.conf':
     content => template('collectd/plugin/vmem.conf.erb'),

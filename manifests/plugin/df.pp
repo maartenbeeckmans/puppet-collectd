@@ -1,3 +1,4 @@
+#
 class collectd::plugin::df (
   $fs_types = ['ext3', 'ext4', 'xfs', 'nfs', 'nfs4'],
   $ignore_selected = false,

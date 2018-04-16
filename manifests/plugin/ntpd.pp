@@ -1,3 +1,4 @@
+#
 class collectd::plugin::ntpd(
   $host            = 'localhost',
   $port            = 123,

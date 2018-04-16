@@ -1,3 +1,4 @@
+#
 class collectd::plugin::ipmi {
 
   user { 'collectd':

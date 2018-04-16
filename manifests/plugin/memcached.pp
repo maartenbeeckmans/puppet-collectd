@@ -1,3 +1,4 @@
+#
 class collectd::plugin::memcached {
 
   file { '/etc/collectd.d/memcached.conf':

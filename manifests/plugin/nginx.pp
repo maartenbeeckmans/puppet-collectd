@@ -1,3 +1,4 @@
+#
 class collectd::plugin::nginx(
   $statusurl = 'http://localhost/ngxinx_status',
   $url = undef,

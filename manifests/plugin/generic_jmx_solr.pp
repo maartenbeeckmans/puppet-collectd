@@ -46,9 +46,9 @@ class collectd::plugin::generic_jmx_solr(
       require => Package['collectd'],
       notify  => Service['collectd'];
     'custom.types.db-lookups':
-      path    => '/usr/share/collectd/types.db',
-      line    => 'lookups   value:GAUGE:0:U',
-      notify  => Service['collectd'];
+      path   => '/usr/share/collectd/types.db',
+      line   => 'lookups   value:GAUGE:0:U',
+      notify => Service['collectd'];
     'custom.types.db-inserts':
       path    => '/usr/share/collectd/types.db',
       line    => 'inserts   value:GAUGE:0:U',

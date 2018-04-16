@@ -1,3 +1,4 @@
+#
 class collectd::plugin::puppetdb(
   $listen_ip = hiera('collectd::plugin::puppetdb::listen_ip', $::ipaddress)
 )

@@ -1,3 +1,4 @@
+#
 class collectd::plugin::python {
 
   if $::operatingsystemmajrelease != '7' {

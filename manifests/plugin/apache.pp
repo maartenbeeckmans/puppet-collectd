@@ -1,3 +1,4 @@
+#
 class collectd::plugin::apache(
   $statusurl = 'http://localhost/server-status?auto',
   $managelocalvhost = false,

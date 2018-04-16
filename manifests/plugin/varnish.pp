@@ -1,3 +1,4 @@
+#
 class collectd::plugin::varnish (
   $version = 4,
   $collectCache       = true,
