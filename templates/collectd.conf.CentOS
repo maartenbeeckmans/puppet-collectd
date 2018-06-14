@@ -106,7 +106,7 @@ LoadPlugin cpu
 #LoadPlugin fscache
 #LoadPlugin gmond
 #LoadPlugin hddtemp
-LoadPlugin interface
+#LoadPlugin interface
 #LoadPlugin iptables
 #LoadPlugin ipmi
 #LoadPlugin ipvs

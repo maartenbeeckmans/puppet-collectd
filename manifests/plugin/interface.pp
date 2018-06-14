@@ -2,7 +2,16 @@
 #
 #
 class collectd::plugin::interface (
-  $interfaces = ['lo', '/^veth/','/^tun[0-9]+/'],
+  $interfaces = [
+    'lo',
+    '/^veth/',
+    '/^tun[0-9]+/',
+    '/^virbr[0-9]+/',
+    '/^vnet[0-9]+/',
+    'ip_vti0',
+    'gretap0',
+    'gre0',
+  ],
   $ignore_selected = true,
 ) {
 
