@@ -41,7 +41,7 @@ do
   echo "PUTVAL $HOSTNAME/redis-$PORT/current_connections-clients interval=$INTERVAL N:$connected_clients"
   echo "PUTVAL $HOSTNAME/redis-$PORT/current_connections-slaves interval=$INTERVAL N:$connected_slaves"
   echo "PUTVAL $HOSTNAME/redis-$PORT/uptime interval=$INTERVAL N:$uptime"
-  echo "PUTVAL $HOSTNAME/redis-$PORT/df-memory interval=$INTERVAL N:$used_memory:U"
+  echo "PUTVAL $HOSTNAME/redis-$PORT/gauge-used_memory interval=$INTERVAL N:$used_memory"
   echo "PUTVAL $HOSTNAME/redis-$PORT/files-unsaved_changes interval=$INTERVAL N:$changes_since_last_save"
   echo "PUTVAL $HOSTNAME/redis-$PORT/total_operations interval=$INTERVAL N:$total_commands_processed"
   echo "PUTVAL $HOSTNAME/redis-$PORT/objects-keys-total interval=$INTERVAL N:$keys"
