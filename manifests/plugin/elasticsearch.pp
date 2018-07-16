@@ -6,12 +6,12 @@ class collectd::plugin::elasticsearch (
 {
 
   include collectd::plugin::python
-  file { '/usr/local/collectd-plugins/elasticsearch.py':
+  file { '/usr/local/collectd-plugins/elasticsearch_collectd.py':
     ensure => 'file',
     group  => 'root',
     mode   => '0644',
     owner  => 'root',
-    source => 'puppet:///modules/collectd/plugin/elasticsearch.py',
+    source => 'puppet:///modules/collectd/plugin/elasticsearch_collectd.py',
   }
 
   file { '/etc/collectd.d/elasticsearch.conf':
