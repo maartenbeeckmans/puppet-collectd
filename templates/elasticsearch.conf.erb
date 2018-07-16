@@ -6,10 +6,9 @@
 ### SignalFX collectd Elasticsearch plugin configuration
 <Plugin "python">
     ModulePath "/usr/local/collectd-plugins/"
+    Import "elasticsearch_collectd"
 
-    Import "elasticsearch"
-
-    <Module "elasticsearch">
+    <Module "elasticsearch_collectd">
         Verbose false
         Cluster "<%= es_clustername %>"
         Indexes ["_all"]
