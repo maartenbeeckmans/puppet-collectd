@@ -20,7 +20,7 @@ class collectd::plugin::elasticsearch (
     mode    => '0644',
     owner   => '0',
     content => template('collectd/elasticsearch.conf.erb'),
-    require => File['usr/local/collectd-plugins/elasticsearch_collectd.py'],
+    require => File['/usr/local/collectd-plugins/elasticsearch_collectd.py'],
     notify  => Service['collectd'],
   }
 
