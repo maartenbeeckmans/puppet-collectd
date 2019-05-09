@@ -28,6 +28,7 @@ class collectd::plugin::graphitewriter ( $graphitehost, $graphiteport) {
     owner   => '0',
     source  => 'puppet:///modules/collectd/collectd-carbon/carbon_writer.py',
     require => File['/usr/local/collectd-plugins/'],
+    notify  => Service['collectd'],
   }
 
   file {

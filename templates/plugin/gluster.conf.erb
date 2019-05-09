@@ -1,0 +1,18 @@
+### File managed with puppet ###
+### Module:           '<%= scope.to_hash['module_name'] %>'
+### Template source:  '<%= template_source %>'
+
+TypesDB     "/usr/share/collectd/types.db"
+TypesDB     "/usr/share/collectd/types.db.gluster"
+
+LoadPlugin python
+<Plugin python>
+  ModulePath "/usr/local/collectd-plugins/collectd_gluster/"
+  LogTraces true
+  Interactive false
+  Import "gluster"
+
+  <Module gluster>
+    peer_name "<%= fqdn %>"
+  </Module>
+</Plugin>

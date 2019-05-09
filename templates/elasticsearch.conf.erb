@@ -9,15 +9,21 @@
     Import "elasticsearch_collectd"
 
     <Module "elasticsearch_collectd">
+    <% if @enable_ssl %> 
+        Protocol "https"
+        Host "<%= @fqdn %>"
+        Username "<%= @username %>"
+	Password "<%= @password %>"
+    <% end %>
         Verbose false
-        Cluster "<%= es_clustername %>"
+        Cluster "<%= @es_clustername %>"
         Indexes ["_all"]
-        EnableIndexStats <%= enable_index_stats %>
+        EnableIndexStats <%= @enable_index_stats %>
         IndexStatsMasterOnly true
         EnableClusterHealth true
         Interval 10
         IndexInterval 300
-        DetailedMetrics false
+        DetailedMetrics <%= @detailed_metrics %>
         ThreadPools ["search","index"]
         AdditionalMetrics [""]
     </Module>

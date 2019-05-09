@@ -14,6 +14,7 @@ class collectd::plugin::iostat
     mode   => '0755',
     owner  => 'root',
     source => 'puppet:///modules/collectd/plugin/iostat.rb',
+    notify => Service['collectd'],
   }
 
   file { '/etc/collectd.d/iostat.conf':

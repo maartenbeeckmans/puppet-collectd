@@ -19,6 +19,7 @@ class collectd::plugin::mysql(
 
   file { '/usr/local/collectd-plugins/mysql.py':
     source => 'puppet:///modules/collectd/plugin/mysql.py',
+    notify => Service['collectd'],
   }
 
   if $manage_config {

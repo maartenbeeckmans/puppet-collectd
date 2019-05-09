@@ -2,9 +2,10 @@
 class collectd::plugin::haproxy {
 
   file_line { 'haproxyline':
-    path  => '/usr/share/collectd/types.db',
-    line  => 'haproxy_backend   stot:COUNTER:0:U, econ:COUNTER:0:U, eresp:COUNTER:0:U',
-    match => '^haproxy_backend\s+',
+    path   => '/usr/share/collectd/types.db',
+    line   => 'haproxy_backend   stot:COUNTER:0:U, econ:COUNTER:0:U, eresp:COUNTER:0:U',
+    match  => '^haproxy_backend\s+',
+    notify => Service['collectd'],
   }
 
   # right permissions are configured in haproxy profile as default
